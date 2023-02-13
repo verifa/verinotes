@@ -1,0 +1,24 @@
+.DS_Store
+
+# Ent generated files
+ent/*
+!ent/generate.go
+!ent/schema
+
+# Goreleaser dist folder
+dist/
+
+# Exclude binaries
+verinotes # name of the project
+build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
