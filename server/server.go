@@ -2,15 +2,21 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httplog"
+	"github.com/verifa/verinotes/store"
 )
 
-func New(ctx context.Context) (*chi.Mux, error) {
+type ServerImpl struct {
+	store *store.Store
+}
+
+func New(ctx context.Context, store *store.Store) (*chi.Mux, error) {
 	// Create logger
 	logger := httplog.NewLogger("verinotes", httplog.Options{
 		JSON:    false,
@@ -33,10 +39,25 @@ func New(ctx context.Context) (*chi.Mux, error) {
 		// Debug:            true,
 	}))
 
+	serverImpl := ServerImpl{
+		store: store,
+	}
 	// TODO routes
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World!"))
 	})
 
+	// TODO use the store:
+	r.Post("/note", serverImpl.CreateNote)
+
 	return r, nil
+}
+
+func returnJSON(w http.ResponseWriter, obj interface{}) {
+	b, err := json.Marshal(obj)
+	if err != nil {
+		http.Error(w, "Creating JSON response: "+err.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "text/json; charset=utf-8")
+	w.Write(b)
 }

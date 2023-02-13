@@ -24,11 +24,12 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/verifa/verinotes/server"
+	"github.com/verifa/verinotes/store"
 )
 
 // var serverConfig server.Config
 
-// var storeConfig store.Config
+var storeConfig store.Config
 
 // serverCmd represents the server command
 var serverCmd = &cobra.Command{
@@ -47,7 +48,12 @@ to quickly create a Cobra application.`,
 		//if serverConfig.DevMode {
 		//}
 
-		srv, err := server.New(ctx)
+		store, err := store.New(ctx)
+		if err != nil {
+			return fmt.Errorf("creating store: %w", err)
+		}
+
+		srv, err := server.New(ctx, store)
 		if err != nil {
 			return fmt.Errorf("creating server: %w", err)
 		}
