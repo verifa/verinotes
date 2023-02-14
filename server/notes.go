@@ -20,3 +20,12 @@ func (s *ServerImpl) CreateNote(w http.ResponseWriter, r *http.Request) {
 	}
 	returnJSON(w, note)
 }
+
+func (s *ServerImpl) QueryAllNotes(w http.ResponseWriter, r *http.Request) {
+	note, err := s.store.QueryAllNotes()
+	if err != nil {
+		http.Error(w, "Creating note: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	returnJSON(w, note)
+}

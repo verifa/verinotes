@@ -19,7 +19,7 @@ type ServerImpl struct {
 func New(ctx context.Context, store *store.Store) (*chi.Mux, error) {
 	// Create logger
 	logger := httplog.NewLogger("verinotes", httplog.Options{
-		JSON:    false,
+		JSON:    false, // could expose as config option
 		Concise: true,
 	})
 
@@ -42,13 +42,13 @@ func New(ctx context.Context, store *store.Store) (*chi.Mux, error) {
 	serverImpl := ServerImpl{
 		store: store,
 	}
-	// TODO routes
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World!"))
 	})
 
-	// TODO use the store:
 	r.Post("/note", serverImpl.CreateNote)
+	r.Get("/notes", serverImpl.QueryAllNotes)
 
 	return r, nil
 }

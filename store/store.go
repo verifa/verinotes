@@ -26,7 +26,6 @@ func New(ctx context.Context) (*Store, error) {
 	if err != nil {
 		log.Fatalf("failed opening connection to sqlite: %v", err)
 	}
-	defer client.Close()
 	// Run the auto migration tool.
 	if err := client.Schema.Create(context.Background()); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
@@ -50,6 +49,11 @@ func (s *Store) CreateNote(note *ent.Note) (*ent.Note, error) {
 	}
 	log.Println("note was created: ", u)
 	return u, nil
+}
+
+// TODO never called, should I defer it somewhere (after creating New store?)
+func (s *Store) Close() error {
+	return s.client.Close()
 }
 
 func (s *Store) QueryNote(id int) (*ent.Note, error) {
