@@ -47,9 +47,10 @@ func New(ctx context.Context, store *store.Store) (*chi.Mux, error) {
 		w.Write([]byte("Hello World!"))
 	})
 
-	r.Post("/note", serverImpl.CreateNote)
-	r.Get("/notes", serverImpl.QueryAllNotes)
-
+	r.Route("/api/v1", func(r chi.Router) {
+		r.Post("/note", serverImpl.CreateNote)
+		r.Get("/notes", serverImpl.QueryAllNotes)
+	})
 	return r, nil
 }
 
