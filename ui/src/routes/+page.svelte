@@ -9,7 +9,6 @@
 
 	const notesStore = createHttpStore<NotesResp>();
 	onMount(async () => {
-		console.log("get notes!")
 		notesStore.get('/notes');
 	})
 

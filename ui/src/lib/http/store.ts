@@ -63,7 +63,6 @@ export function createHttpStore<Data>() {
                         value.status = response.status
                         value.ok = response.ok
                         value.data = data
-                        console.log(value)
                         return value
                     })
                 }).catch((error) => {
