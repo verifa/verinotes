@@ -35,4 +35,64 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+# Adding DaisyUI (and TailwindCSS)
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init tailwind.config.cjs -p
+```
+
+Modify `tailwind.config.cjs`:
+
+```js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./src/routes/**/*.{svelte,js,ts}'],
+  theme: { // in one example theme is not present, in another it is
+    extend: {},
+  },
+  plugins: [require('daisyui')],
+};
+```
+
+Create two files `app.css` and `+layout.svelte`, respectively:
+
+```
+$ tree
+.
+├── app.css
+├── app.d.ts
+├── app.html
+└── routes
+    ├── +layout.svelte
+    └── +page.svelte
+```
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+```svelte
+<script>
+  import '../app.css';
+</script>
+
+<slot />
+```
+
+Now finally install daisyui (the site won't be available until this is done):
+
+```bash
+npm i daisyui
+```
+
+Now it's done! Add stuff to `+page.svelte` to start using the classes.
+
+Two switch themes modify `app.html`:
+
+```diff
+- <html lang="en">
++ <html lang="en" data-theme="cupcake">
+```
