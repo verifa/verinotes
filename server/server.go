@@ -65,6 +65,9 @@ func New(ctx context.Context, store *store.Store) (*chi.Mux, error) {
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Post("/note", serverImpl.CreateNote)
 		r.Get("/notes", serverImpl.QueryAllNotes)
+		r.Get("/note/{noteID}", serverImpl.GetNote)
+		r.Put("/note/{noteID}", serverImpl.UpdateNote)
+		r.Delete("/note/{noteID}", serverImpl.DeleteNote)
 	})
 	return r, nil
 }
