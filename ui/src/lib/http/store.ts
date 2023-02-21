@@ -107,5 +107,7 @@ export function createHttpStore<Data>() {
             request('GET', path, params, data),
         post: (path: string, params?: Record<string, string>, data?: object) =>
             request('POST', path, params, data),
+        put: (path: string, params?: Record<string, string>, data?: object) =>
+            request('PUT', path, params, data),
     };
 }

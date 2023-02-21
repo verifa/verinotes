@@ -13,7 +13,6 @@ type Note struct {
 // Fields of the Note.
 func (Note) Fields() []ent.Field {
 	return []ent.Field{
-		//field.Int("id").Positive(), // TODO: how to make this just autoincrement?
 		field.String("data").Default("empty"),
 	}
 }

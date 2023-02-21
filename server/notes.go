@@ -53,6 +53,8 @@ func (s *ServerImpl) DeleteNote(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Deleting note: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+	var emptyResp = map[string]string{} // return empty body, maybe some fancier way to do this?
+	returnJSON(w, emptyResp)
 }
 
 func (s *ServerImpl) QueryAllNotes(w http.ResponseWriter, r *http.Request) {
