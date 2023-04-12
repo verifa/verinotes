@@ -33,11 +33,13 @@
 
 </script>
 
+<div class="items-center content-center flex flex-col">
 <h1>Create note</h1>
 
-<div class="card w-96 bg-base-100 shadow-xl my-4 border border-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+<div class="card content-center w-96 bg-base-100 shadow-xl my-4 border border-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
 	<div class="card-body">
 		<input type="text" bind:value={$store.data} placeholder="Type here" class="input w-full max-w-xs border border-gray-500" />
 		<button on:click={handleOnSubmit} class="btn btn-secondary">Add</button>
 	</div>
+</div>
 </div>

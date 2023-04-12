@@ -4,5 +4,8 @@ module.exports = {
   theme: { // in one example theme is not present, in another it is
     extend: {},
   },
-  plugins: [require('daisyui')],
+  plugins: [
+    require("@tailwindcss/typography"),
+    require('daisyui')
+  ],
 };

@@ -3,4 +3,4 @@ export async function load({ fetch, params }) {
     const note = await res.json();
    
     return { note };
-  }
+}
