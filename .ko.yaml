@@ -1,0 +1,5 @@
+builds:
+- id: verinote
+  flags:
+  - --tags
+  - ui

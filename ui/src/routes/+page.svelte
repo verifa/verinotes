@@ -3,7 +3,13 @@
 	import { onMount } from 'svelte';
 	import { base } from '$app/paths';
 
-	let content = '';
+	let hostname = '';
+
+	async function getHostname() {
+		const res = await fetch(`/api/v1/info`);
+		const info = res.text();
+		return info;
+	}
 
 	type NotesCreateResp = {
 		id: string;
@@ -15,6 +21,9 @@
 
 	onMount(async () => {
 		notesStore.get('/notes');
+		getHostname().then((host) => {
+			hostname = host;
+		});
 	});
 
 	async function deleteNote(id: string) {
@@ -67,6 +76,9 @@
 	
 <div class="text-center">
 	<h1>Welcome to VeriNotes!</h1>
+	{#if hostname != ''}
+	<h3>{"Hostname: "+hostname}</h3>
+	{/if}
 	<!-- <p>Visit <a href="https://verifa.io">verifa.io</a> to learn more about Verifa</p> -->
 
 	<a href="{base}/notes/new" class="btn btn-primary w-96 text-white bg-black hover:bg-gray-800"

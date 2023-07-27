@@ -1,0 +1,62 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: verinotes
+spec:
+  rules:
+  - host: 127.0.0.1.nip.io
+    http:
+      paths:
+      - path: "/"
+        backend:
+          service:
+            name: verinotes
+            port:
+              number: 3000
+        pathType: Prefix
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: verinotes
+  labels:
+    app: verinotes
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: verinotes
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verinotes-deployment
+  labels:
+    app: verinotes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: verinotes
+  template:
+    metadata:
+      labels:
+        app: verinotes
+    spec:
+      containers:
+      - name: verinotes
+        image: github.com/verifa/verinotes:v0.0.1 #local build pushed to kind
+        imagePullPolicy: IfNotPresent #don't try to pull
+        env:
+        - name: VN_POSTGRES_USER
+          value: postgres
+        - name: VN_POSTGRES_PASSWORD
+          value: veristrongpassword
+        - name: VN_POSTGRES_HOST
+          value: postgres-postgresql.verinotes.svc.cluster.local
+        args: ["server"]
+        ports:
+        - containerPort: 3000
+

@@ -1,3 +1,5 @@
+// Copyright © 2023 Verifa <info@verifa.io>
+// SPDX-License-Identifier: Apache-2.0
 package server
 
 import (
@@ -11,7 +13,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/cors"
 	"github.com/go-chi/httplog"
 	"github.com/verifa/verinotes/store"
 	"github.com/verifa/verinotes/ui"
@@ -32,17 +33,6 @@ func New(ctx context.Context, store *store.Store) (*chi.Mux, error) {
 	r.Use(httplog.RequestLogger(logger))
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/healthz"))
-
-	r.Use(cors.Handler(cors.Options{
-		// AllowedOrigins:   []string{"*"},
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5173", "http://localhost:9998"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "*"},
-		ExposedHeaders:   []string{"*"},
-		AllowCredentials: true,
-		MaxAge:           300, // Maximum value not ignored by any of major browsers
-		// Debug:            true,
-	}))
 
 	serverImpl := ServerImpl{
 		store: store,
@@ -68,8 +58,18 @@ func New(ctx context.Context, store *store.Store) (*chi.Mux, error) {
 		r.Get("/note/{noteID}", serverImpl.GetNote)
 		r.Put("/note/{noteID}", serverImpl.UpdateNote)
 		r.Delete("/note/{noteID}", serverImpl.DeleteNote)
+		r.Get("/info", GetInfo)
 	})
 	return r, nil
+}
+
+func GetInfo(w http.ResponseWriter, r *http.Request) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		http.Error(w, "Error fetching hostname: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte(hostname))
 }
 
 // handleUI returns a handler for our Single Page Application that checks if a

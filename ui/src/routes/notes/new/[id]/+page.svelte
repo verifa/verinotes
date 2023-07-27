@@ -29,8 +29,6 @@
 	});
 
 	function handleOnSubmit() {
-		console.log($store)
-		console.log(data)
 		createNoteStore.put(`/note/${data.note.id}`, {}, { data: $store.note });
 	}
 </script>

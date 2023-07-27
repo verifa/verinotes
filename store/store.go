@@ -1,3 +1,5 @@
+// Copyright © 2023 Verifa <info@verifa.io>
+// SPDX-License-Identifier: Apache-2.0
 package store
 
 import (
@@ -6,6 +8,7 @@ import (
 	"log"
 	"time"
 
+	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/verifa/verinotes/ent"
 	"github.com/verifa/verinotes/ent/note"
@@ -18,19 +21,38 @@ type Store struct {
 }
 
 type Config struct {
-	SessionDuration time.Duration
+	SessionDuration  time.Duration
+	PostgresUser     string `split_words:"true"`
+	PostgresPassword string `split_words:"true"`
+	PostgresDbName   string `default:"verinotes" split_words:"true"`
+	PostgresHost     string `split_words:"true"`
+	PostgresPort     string `default:"5432" split_words:"true"`
+	PostgresSslMode  string `default:"disable" split_words:"true"`
 }
 
-func New(ctx context.Context) (*Store, error) {
-	client, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
-	if err != nil {
-		log.Fatalf("failed opening connection to sqlite: %v", err)
+func New(ctx context.Context, config *Config) (*Store, error) {
+	var client *ent.Client
+	var err error
+
+	if len(config.PostgresUser) > 0 {
+		format := "host=%s port=%s user=%s dbname=%s password=%s sslmode=%s"
+		connectionString := fmt.Sprintf(format, config.PostgresHost, config.PostgresPort, config.PostgresUser, config.PostgresDbName, config.PostgresPassword, config.PostgresSslMode)
+		log.Println("connectionString for Postgres: ", connectionString)
+		client, err = ent.Open("postgres", connectionString)
+		if err != nil {
+			log.Fatalf("failed opening connection to postgres: %v", err)
+		}
+	} else {
+		log.Println("no postgres user defined, falling back to in-memory sqlite")
+		client, err = ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
+		if err != nil {
+			log.Fatalf("failed opening connection to sqlite: %v", err)
+		}
 	}
 	// Run the auto migration tool.
 	if err := client.Schema.Create(context.Background()); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
-
 	s := Store{
 		ctx:    ctx,
 		client: client,
