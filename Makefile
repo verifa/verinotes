@@ -33,3 +33,28 @@ build: fe-build ent-gen be-build
 run:
 	./build/verinotes server
 
+.PHONY: lint
+lint:
+	golangci-lint run
+
+#
+# Security Scans
+#
+
+.PHONY: scan
+scan: osv-go gosec osv-ui govulncheck-scan
+
+.PHONY: osv-go
+osv-go:
+	osv-scanner -L go.mod --format json | jq '.results[].packages[].vulnerabilities[]'
+.PHONY: osv-ui
+osv-ui:
+	osv-scanner -L ui/package-lock.json --format json | jq '.results[].packages[].vulnerabilities[]'
+.PHONY: gosec
+gosec:
+	gosec -fmt=json ./...
+
+.PHONY: govulncheck-scan
+govulncheck-scan:
+	govulncheck ./...
+
