@@ -6,26 +6,30 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
 
+/*
+Config file would be useful to specify custom port etc., but perhaps envconfig
+is preferred.
 var (
 	configFiles []string
-	// dbConfig
-	// notesConfig
 )
+*/
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "github.com/verifa/verinotes",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Use:   "verinotes",
+	Short: "VeriNotes - for note taking",
+	Long: `VeriNotes
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+At the moment there's only one command you should be interested in:
+
+./verinotes server
+
+This brings up the VeriNotes application listening on port 3000, the UI
+is embedded under path /ui, but users will be automatically forwarded to it.
+The API is available under /api/v1.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -41,22 +45,8 @@ func Execute() {
 	}
 }
 
+/*
 func init() {
-	cobra.OnInitialize(initConfig)
-
-	// TODO envconfig, or no envconfig :shrug:
-	// envErr := envconfig.Process("CL", &requestsConfig)
-	// cobra.CheckErr(envErr)
-
 	rootCmd.PersistentFlags().StringSliceVar(&configFiles, "config", nil, "config files to parse")
 }
-
-// initConfig reads in .env config files, if any
-func initConfig() {
-	// If configFiles is nil, godotenv will look for a local .env file by default, which
-	// is kind of unexpected for a user
-	if configFiles != nil {
-		err := godotenv.Overload(configFiles...)
-		cobra.CheckErr(err)
-	}
-}
+*/

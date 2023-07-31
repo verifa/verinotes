@@ -1,0 +1,107 @@
+name: CI workflow
+
+on:
+  # run this workflow on any branch or a PR
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+env:
+  # TODO REMOVE when public
+  GOPRIVATE: github.com/verifa
+  GH_PAT: ${{ secrets.GH_PAT }}
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 #v3.5.3
+    - name: Install Go
+      uses: actions/setup-go@fac708d6674e30b6ba41289acaab6d4b75aa0753 #v4.0.1
+      with:
+        go-version: '1.19'
+        cache: true
+    # TODO REMOVE when public
+    - run: git config --global url.https://$GH_PAT@github.com/.insteadOf https://github.com/
+    - name: Test
+      run: |
+        make ent-gen
+        go mod tidy
+        go test -v -failfast ./...
+    - name: Full build of verinotes
+      run: make build
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 #v3.5.3
+    - name: Install Go
+      uses: actions/setup-go@fac708d6674e30b6ba41289acaab6d4b75aa0753 #v4.0.1
+      with:
+        go-version: '1.19'
+        cache: true
+    - name: Install `govulncheck`, `gosec` and `osv-scanner`
+      run: |
+        go install golang.org/x/vuln/cmd/govulncheck@latest
+        go install github.com/securego/gosec/v2/cmd/gosec@latest
+        go install github.com/google/osv-scanner/cmd/osv-scanner@latest
+    - name: Run all scanners and fail if more than X issues found
+      env:
+        GOSEC_THRESHOLD: 5
+        OSVSCAN_THRESHOLD: 5
+      run: |
+        PROBLEMS_FOUND=0
+        make ent-gen # needed for some of the scans
+        # run osv-scanner
+        echo "starting osv-scanner..."
+        osv-scanner -L go.mod -L ui/package-lock.json --format json > osv-out.json || true # don't fail if vulns found
+        OSV_HIGH_COUNT=$(cat osv-out.json | jq '.results[].packages[].vulnerabilities[] | select(.database_specific.severity=="HIGH")' | jq -s 'length')
+        OSV_CRITICAL_COUNT=$(cat osv-out.json | jq '.results[].packages[].vulnerabilities[] | select(.database_specific.severity=="CRITICAL")' | jq -s 'length')
+        echo "osv-scanner found $OSV_HIGH_COUNT vulnerabilities with severity HIGH"
+        echo "osv-scanner found $OSV_CRITICAL_COUNT vulnerabilities with severity CRITICAL"
+        if [[ $OSV_HIGH_COUNT -gt $OSVSCAN_THRESHOLD || $OSV_CRITICAL_COUNT -gt 0 ]]; then
+          echo "====== OSV SCAN FOUND TOO MANY VULNERABILITIES ======"
+          echo $OSVSCAN_RESULTS
+          let "PROBLEMS_FOUND=PROBLEMS_FOUND+1"
+        fi
+        # run gosec scanner, HIGH is the highest severity level for gosec
+        echo "Starting gosec scanner..."
+        GOSEC_RESULTS=$(gosec --fmt json ./... > gosec-out.json) || true # don't fail if vulns found
+        GOSEC_HIGH_COUNT=$(cat gosec-out.json | jq '.Issues[] | select(.severity=="HIGH")' | jq -s 'length')
+        echo "gosec found $OSV_HIGH_COUNT vulnerabilities with severity HIGH"
+        if [[ $GOSEC_HIGH_COUNT -gt $GOSEC_THRESHOLD ]]; then
+          echo "====== GOSEC SCAN FOUND TOO MANY VULNERABILITIES ======"
+          echo $GOSEC_RESULTS
+          let "PROBLEMS_FOUND=PROBLEMS_FOUND+1"
+        fi
+        echo "starting govulncheck scanner..."
+        # currently govulncheck does not find any vulnerabilities, so let's consider every non-0 return code a problem
+        govulncheck -json ./... || let "PROBLEMS_FOUND=PROBLEMS_FOUND+1"
+        if [ $PROBLEMS_FOUND -gt 0 ]; then
+          echo "$PROBLEMS_FOUND problems found, please inspect carefully the output"
+          exit 1
+        fi
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 #v3.5.3
+    - uses: actions/setup-go@v4
+      with:
+        go-version: '1.19'
+        cache: true
+    - name: Run `go generate` since the ent generated files are not included in the repo
+      run: make ent-gen
+    # use golangci-lint action since it has nice output and is recommended
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+        args: --timeout=3m
+

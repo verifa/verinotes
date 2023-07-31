@@ -1,0 +1,4 @@
+issues:
+  exclude:
+    # decided this is not really an issue
+    - 'Error return value of .(.*w\.Write). is not checked'
