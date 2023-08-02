@@ -42,7 +42,7 @@ jobs:
         go mod tidy
         go generate ./...
         # build the SPA UI so it can be embedded into the binary when `ko` builds
-	make fe-build
+        make fe-build
 
         # Build & push the image. Save the image name.
         # NOTICE the '--bare' flag, this uses the value of KO_DOCKER_REPO
