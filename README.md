@@ -1,6 +1,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/verifa/verinotes)](https://goreportcard.com/report/github.com/verifa/verinotes)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![CI workflow](https://github.com/verifa/verinotes/actions/workflows/ci.yaml/badge.svg)
+![Release workflow](https://github.com/verifa/verinotes/actions/workflows/release.yaml/badge.svg)
+[![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
 
 # VeriNotes
 
