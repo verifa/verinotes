@@ -1,3 +1,6 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/verifa/verinotes)](https://goreportcard.com/report/github.com/verifa/verinotes)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 # VeriNotes
 
 Simple application for note taking, meant for demos.
