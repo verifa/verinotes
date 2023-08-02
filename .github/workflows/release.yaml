@@ -131,8 +131,9 @@ jobs:
           syft --output spdx-json file:./ui/package-lock.json --file sbom-ui.spdx.json
 
           # use the experimental sbom-merge tool to merge the ui and container(+go backend) SBOMs
-          cd sbom-merge && go mod tidy && go build -o ../sbom-merge && cd ..
-          ./sbom-merge sbom.spdx.json sbom-ui.spdx.json > sbom-final.spdx.json
+          cd sbom-merge && go mod tidy && go build -o ../sbom-merge-tool && cd ..
+          ls -l
+          ./sbom-merge-tool sbom.spdx.json sbom-ui.spdx.json > sbom-final.spdx.json
 
           # attach merged sbom as attestation (signed)
           cosign attest --predicate sbom-final.spdx.json --type spdxjson "${image}@${digest}" --yes
