@@ -10,10 +10,6 @@ on:
       - "**"
 
 env:
-  # TODO REMOVE when public
-  GOPRIVATE: github.com/verifa
-  GH_PAT: ${{ secrets.GH_PAT }}
-
 jobs:
   build-test:
     runs-on: ubuntu-latest
@@ -25,8 +21,6 @@ jobs:
       with:
         go-version: '1.19'
         cache: true
-    # TODO REMOVE when public
-    - run: git config --global url.https://$GH_PAT@github.com/.insteadOf https://github.com/
     - name: Test
       run: |
         make ent-gen
