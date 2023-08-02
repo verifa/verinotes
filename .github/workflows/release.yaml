@@ -39,8 +39,8 @@ jobs:
         echo "${{ github.token }}" | ko login ghcr.io --username ${{ github.actor }} --password-stdin
 
         # fetch go deps to local and generate ent files
-        go mod tidy
         go generate ./...
+        go mod tidy
         # build the SPA UI so it can be embedded into the binary when `ko` builds
         make fe-build
 
