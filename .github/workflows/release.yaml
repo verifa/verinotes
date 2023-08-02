@@ -94,6 +94,7 @@ jobs:
     steps:
       - name: checkout repo of sbom-merge, compile during build
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 #v3.5.3
+        with:
           repository: verifa/sbom-merge
           path: sbom-merge
           ref: e279f901130689f7576ff33ad65e34cb9767150b # v0.0.1
