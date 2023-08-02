@@ -125,7 +125,7 @@ jobs:
 
           # ui SBOM is generated explicitly since syft cannot find it inside Go binary
           # this is an example why SBOM is good to create at build time, not afterwards
-          syft --output spdx-json ui/package-lock.json --file sbom-ui.spdx.json
+          syft --output spdx-json file:./ui/package-lock.json --file sbom-ui.spdx.json
 
           # use the experimental sbom-merge tool to merge the ui and container(+go backend) SBOMs
           cd sbom-merge && go mod tidy && go build -o ../sbom-merge && cd ..
